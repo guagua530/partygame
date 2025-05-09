@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // 设置活动开始时间 - 2025年5月10日20:00
+    // 设置活动开始时间 - 2025年5月8日20:00
     const eventDate = new Date(2025, 4, 10, 20, 0, 0); // 注意月份是从0开始的，所以5月是4
     
     // 检查当前时间是否达到活动时间
@@ -50,6 +50,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // 获取分类选择器并隐藏
         const categorySelector = document.querySelector('.category-selector');
         categorySelector.style.display = 'none';
+        
+        // 获取模式选择器并隐藏
+        const modeSelector = document.querySelector('.mode-selector');
+        if (modeSelector) {
+            modeSelector.style.display = 'none';
+        }
         
         // 添加到游戏卡片中
         const gameCard = document.querySelector('.game-card');
@@ -180,9 +186,14 @@ document.addEventListener('DOMContentLoaded', function() {
             nextButton.style.display = 'block';
         }
         
-        const categorySelector = document.querySelector('.category-selector');
-        if (categorySelector) {
-            categorySelector.style.display = 'flex';
+        const truthCategories = document.getElementById('truth-categories');
+        if (truthCategories) {
+            truthCategories.style.display = 'flex';
+        }
+        
+        const modeSelector = document.querySelector('.mode-selector');
+        if (modeSelector) {
+            modeSelector.style.display = 'flex';
         }
     }
     
@@ -231,7 +242,10 @@ document.addEventListener('DOMContentLoaded', function() {
             lastTouchEnd = now;
         }, { passive: false });
         
-        // 原始问题（前31个）
+        // 当前游戏模式
+        let currentMode = 'truth'; // 'truth' 或 'dare'
+        
+        // 原始问题（前31个）- 真心话
         const originalQuestions = [
             "今天你想跟谁共进晚餐？",
             "你会想出名吗？以什么样方式出名昵？",
@@ -266,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
             "你的家着火了，里面有你所拥有的一切事物.在救出你爱的人，你的宠物后，你还有时间最后再冲回去一趟拯救最后一样任何东西，你会救出什么？"
         ];
         
-        // 新增心理学问题
+        // 新增心理学问题 - 真心话
         const psychologyQuestions = [
             "如果可以读取在座任何一个人的思想，你会选择谁，为什么？",
             "你认为自己最大的心理优势是什么？这个优势如何影响了你的人生？",
@@ -299,54 +313,190 @@ document.addEventListener('DOMContentLoaded', function() {
             "如果你的人生是一本书，现在是哪一章？这一章的标题会是什么？"
         ];
         
-        // 所有问题
+        // 轻松挑战 - 大冒险
+        const easyDares = [
+            "模仿一位在场的人，直到有人猜出你在模仿谁。",
+            "闭着眼睛画一幅画，内容由其他人指定。",
+            "用夸张的表情朗读你手机里最后收到的短信。",
+            "尝试站着不动保持平衡一分钟，同时其他人可以逗你笑。",
+            "和在场的一个人玩石头剪刀布，输的人要做5个俯卧撑。",
+            "用最夸张的方式演绎一首大家都知道的歌，不能唱出歌词。",
+            "即兴表演一个60秒的默剧，主题由其他人选择。",
+            "让小组中的其他人用你的头发创造一个新发型，并保持10分钟。",
+            "用夸张的口音朗读手机备忘录里的内容。",
+            "尝试双手背后开一个小零食包装袋。",
+            '做一个即兴的一分钟演讲，主题是"为什么我是这个房间里最有趣的人"。',
+            "在不看屏幕的情况下，使用语音输入向你的一位好友发送消息。",
+            "表演你最拿手的才艺，无论多奇怪。",
+            "与在场的某人合影，摆出三个搞笑姿势。",
+            "用纸巾卷成鼻子，模仿大象走路并发出大象的声音。",
+            "戴上耳机，外放音乐跳一段舞，但其他人不能听到音乐。",
+            "闭着眼睛画出在座的某个人，并让大家猜是谁。",
+            "一口气说出10个以相同字母开头的水果或动物名称。",
+            "模仿一种动物，直到有人猜出是什么动物。",
+            "用舌头尝试碰到你的鼻子或下巴，坚持10秒钟。"
+        ];
+        
+        // 刺激挑战 - 大冒险
+        const spicyDares = [
+            "讲一个关于你的真实尴尬故事，是你以前从未告诉过在场任何人的。",
+            "展示你手机里最近拍摄的5张照片并解释每张照片的背景。",
+            "让在场的人查看你的社交媒体，并选择一张照片加上他们想要的评论（但不发布）。",
+            "打电话给你通讯录中的一位朋友，说出其他人指定的台词。",
+            "与在场的某人进行眼神接触比赛，谁先笑谁就输。",
+            "展示你的舞蹈技巧，跳一段即兴舞蹈，时长至少30秒。",
+            "模仿你喜欢的电影/电视剧中的一个场景，并让其他人猜是哪个。",
+            "向在场的每一个人说出一个你欣赏他们的地方。",
+            "向一位不在场的朋友发送一条奇怪的信息，内容由在场的人决定。",
+            "解锁你的手机，让在场的一个人发一条状态（但不能过分）。",
+            "展示你最近的5条搜索记录。",
+            "让在场的人用口红或食物在你脸上画画，保持15分钟。",
+            "喝下一杯由在场其他人混合的无害饮料（限饮料、调味品、水果）。",
+            "模仿一个名人求婚，对象是在场的随机一人。",
+            "表演一段你自编的爱情告白，对象由其他人选择。",
+            "选择一首歌，尽可能夸张地对着手机录一段唱歌视频（不发布）。",
+            "背对着站立，闭眼向后倒，让组内的人接住你。",
+            "允许在场的人给你拍一张有趣的照片并设置为你的手机壁纸，持续到游戏结束。",
+            "扮演你小时候最喜欢的卡通人物，保持角色至少3分钟。",
+            "让在场的人给你设计一个小剧本，你来表演即兴戏剧1分钟。"
+        ];
+        
+        // 所有问题和挑战
         let allQuestions = [...originalQuestions, ...psychologyQuestions];
+        let allDares = [...easyDares, ...spicyDares];
         
         // 当前选中的分类
-        let currentCategory = 'all';
+        let currentTruthCategory = 'all';
+        let currentDareCategory = 'all-dares';
         let currentQuestions = allQuestions;
+        let currentDares = allDares;
         
         const questionElement = document.getElementById('question');
         const questionNumberElement = document.getElementById('questionNumber');
+        const totalQuestionsElement = document.getElementById('totalQuestions');
         const nextButton = document.getElementById('nextBtn');
         const gameCard = document.querySelector('.game-card');
         const questionContainer = document.querySelector('.question-container');
-        const categoryButtons = document.querySelectorAll('.category-btn');
+        const modeButtons = document.querySelectorAll('.mode-btn');
+        const truthCategoryButtons = document.querySelectorAll('#truth-categories .category-btn');
+        const dareCategoryButtons = document.querySelectorAll('#dare-categories .category-btn');
+        const modeIndicator = document.getElementById('mode-indicator');
         
         let usedQuestions = [];
+        let usedDares = [];
         let currentQuestionIndex = null;
         
         // 检测设备是否支持触摸
         const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
         
-        // 更新问题总数显示
-        function updateTotalQuestions() {
-            const totalQuestions = currentQuestions.length;
-            document.querySelector('.question-number').innerHTML = `<i class="fas fa-question-circle"></i> 问题 <span id="questionNumber">${currentQuestionIndex !== null ? currentQuestionIndex + 1 : '?'}</span>/${totalQuestions}`;
+        // 更新按钮文本
+        function updateButtonText() {
+            if (currentMode === 'truth') {
+                nextButton.innerHTML = '<i class="fas fa-random"></i> 抽取问题';
+            } else {
+                nextButton.innerHTML = '<i class="fas fa-fire"></i> 接受挑战';
+            }
         }
         
-        // 分类按钮点击事件
-        categoryButtons.forEach(button => {
+        // 切换游戏模式
+        function switchGameMode(mode) {
+            currentMode = mode;
+            
+            // 更新模式标记样式
+            if (mode === 'truth') {
+                modeIndicator.className = 'mode-tag truth-mode';
+                modeIndicator.innerHTML = '<i class="fas fa-comment"></i> 真心话';
+                
+                // 显示真心话分类，隐藏大冒险分类
+                document.getElementById('truth-categories').style.display = 'flex';
+                document.getElementById('dare-categories').style.display = 'none';
+                
+                // 更新问题总数
+                updateTotalQuestions();
+            } else {
+                modeIndicator.className = 'mode-tag dare-mode';
+                modeIndicator.innerHTML = '<i class="fas fa-fire"></i> 大冒险';
+                
+                // 显示大冒险分类，隐藏真心话分类
+                document.getElementById('truth-categories').style.display = 'none';
+                document.getElementById('dare-categories').style.display = 'flex';
+                
+                // 更新挑战总数
+                updateTotalDares();
+            }
+            
+            // 更新按钮文本
+            updateButtonText();
+            
+            // 重置问题显示
+            questionElement.textContent = '点击下方按钮开始游戏';
+            questionNumberElement.textContent = '?';
+        }
+        
+        // 模式按钮点击事件
+        modeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // 添加按钮点击效果
+                button.classList.add('pulse');
+                setTimeout(() => button.classList.remove('pulse'), 300);
+                
+                // 如果已经是当前模式，则不做操作
+                if (button.classList.contains('active')) {
+                    return;
+                }
+                
+                // 移除所有模式按钮的active类
+                modeButtons.forEach(btn => btn.classList.remove('active'));
+                
+                // 为当前点击的按钮添加active类
+                button.classList.add('active');
+                
+                // 切换游戏模式
+                switchGameMode(button.dataset.mode);
+                
+                // 添加卡片翻转效果
+                gameCard.style.transform = 'rotateY(5deg)';
+                setTimeout(() => {
+                    gameCard.style.transform = 'rotateY(0)';
+                }, 300);
+                
+                // 显示提示
+                showToast(`已切换到${currentMode === 'truth' ? '真心话' : '大冒险'}模式`);
+            });
+        });
+        
+        // 更新问题总数显示
+        function updateTotalQuestions() {
+            totalQuestionsElement.textContent = currentQuestions.length;
+        }
+        
+        // 更新挑战总数显示
+        function updateTotalDares() {
+            totalQuestionsElement.textContent = currentDares.length;
+        }
+        
+        // 真心话分类按钮点击事件
+        truthCategoryButtons.forEach(button => {
             button.addEventListener('click', () => {
                 // 添加按钮点击效果
                 button.classList.add('pulse');
                 setTimeout(() => button.classList.remove('pulse'), 300);
                 
                 // 移除所有分类按钮的active类
-                categoryButtons.forEach(btn => btn.classList.remove('active'));
+                truthCategoryButtons.forEach(btn => btn.classList.remove('active'));
                 
                 // 为当前点击的按钮添加active类
                 button.classList.add('active');
                 
                 // 更新当前分类
-                currentCategory = button.dataset.category;
+                currentTruthCategory = button.dataset.category;
                 
                 // 根据分类设置问题集
-                if (currentCategory === 'all') {
+                if (currentTruthCategory === 'all') {
                     currentQuestions = allQuestions;
-                } else if (currentCategory === 'original') {
+                } else if (currentTruthCategory === 'original') {
                     currentQuestions = originalQuestions;
-                } else if (currentCategory === 'psychology') {
+                } else if (currentTruthCategory === 'psychology') {
                     currentQuestions = psychologyQuestions;
                 }
                 
@@ -357,7 +507,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateTotalQuestions();
                 
                 // 显示提示
-                showToast(`已切换到${currentCategory === 'all' ? '全部' : currentCategory === 'original' ? '经典' : '心理'}问题`);
+                showToast(`已切换到${currentTruthCategory === 'all' ? '全部' : currentTruthCategory === 'original' ? '经典' : '心理'}问题`);
                 
                 // 重置问题显示
                 questionElement.textContent = '点击下方按钮开始游戏';
@@ -371,7 +521,53 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
         
-        // 获取随机问题
+        // 大冒险分类按钮点击事件
+        dareCategoryButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // 添加按钮点击效果
+                button.classList.add('pulse');
+                setTimeout(() => button.classList.remove('pulse'), 300);
+                
+                // 移除所有分类按钮的active类
+                dareCategoryButtons.forEach(btn => btn.classList.remove('active'));
+                
+                // 为当前点击的按钮添加active类
+                button.classList.add('active');
+                
+                // 更新当前分类
+                currentDareCategory = button.dataset.category;
+                
+                // 根据分类设置挑战集
+                if (currentDareCategory === 'all-dares') {
+                    currentDares = allDares;
+                } else if (currentDareCategory === 'easy-dares') {
+                    currentDares = easyDares;
+                } else if (currentDareCategory === 'spicy-dares') {
+                    currentDares = spicyDares;
+                }
+                
+                // 重置已使用挑战
+                usedDares = [];
+                
+                // 更新挑战总数
+                updateTotalDares();
+                
+                // 显示提示
+                showToast(`已切换到${currentDareCategory === 'all-dares' ? '全部' : currentDareCategory === 'easy-dares' ? '轻松' : '刺激'}挑战`);
+                
+                // 重置问题显示
+                questionElement.textContent = '点击下方按钮开始游戏';
+                questionNumberElement.textContent = '?';
+                
+                // 添加卡片翻转效果
+                gameCard.style.transform = 'rotateY(3deg)';
+                setTimeout(() => {
+                    gameCard.style.transform = 'rotateY(0)';
+                }, 300);
+            });
+        });
+        
+        // 获取随机问题 - 真心话
         function getRandomQuestion() {
             // 如果所有问题都已经使用过，重置usedQuestions数组
             if (usedQuestions.length === currentQuestions.length) {
@@ -391,6 +587,29 @@ document.addEventListener('DOMContentLoaded', function() {
             return {
                 question: currentQuestions[questionIndex],
                 number: questionIndex + 1
+            };
+        }
+        
+        // 获取随机挑战 - 大冒险
+        function getRandomDare() {
+            // 如果所有挑战都已经使用过，重置usedDares数组
+            if (usedDares.length === currentDares.length) {
+                usedDares = [];
+                // 显示全部挑战已经被用过的提示
+                showToast('所有挑战都已用过一遍，开始新一轮！');
+            }
+            
+            // 从当前挑战集中过滤出未使用的挑战
+            let availableDares = currentDares.filter((_, index) => !usedDares.includes(index));
+            let randomIndex = Math.floor(Math.random() * availableDares.length);
+            let dareIndex = currentDares.indexOf(availableDares[randomIndex]);
+            
+            usedDares.push(dareIndex);
+            currentQuestionIndex = dareIndex;
+            
+            return {
+                question: currentDares[dareIndex],
+                number: dareIndex + 1
             };
         }
         
@@ -425,26 +644,37 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 3000);
         }
         
-        // 更新问题显示
-        function updateQuestion() {
+        // 更新问题或挑战显示
+        function updateContent() {
             // 添加卡片翻转效果
             gameCard.style.transform = 'rotateY(5deg)';
             
             // 添加问题容器上升效果
             questionContainer.style.transform = 'translateY(10px)';
             
-            const { question, number } = getRandomQuestion();
+            let contentData;
+            
+            // 根据当前模式获取内容
+            if (currentMode === 'truth') {
+                contentData = getRandomQuestion();
+            } else {
+                contentData = getRandomDare();
+            }
             
             // 添加淡出效果
             questionElement.style.opacity = 0;
             questionNumberElement.style.opacity = 0;
             
             setTimeout(() => {
-                questionElement.textContent = question;
-                questionNumberElement.textContent = number;
+                questionElement.textContent = contentData.question;
+                questionNumberElement.textContent = contentData.number;
                 
-                // 更新问题总数
-                updateTotalQuestions();
+                // 根据当前模式更新总数
+                if (currentMode === 'truth') {
+                    updateTotalQuestions();
+                } else {
+                    updateTotalDares();
+                }
                 
                 // 添加淡入效果
                 questionElement.style.opacity = 1;
@@ -544,8 +774,8 @@ document.addEventListener('DOMContentLoaded', function() {
         gameCard.style.transition = 'transform 0.5s ease';
         questionContainer.style.transition = 'transform 0.5s ease';
         
-        // 点击按钮更新问题
-        nextButton.addEventListener('click', updateQuestion);
+        // 点击按钮更新内容
+        nextButton.addEventListener('click', updateContent);
         
         // 添加触摸振动反馈（如果设备支持）
         nextButton.addEventListener('click', function() {
@@ -561,7 +791,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // 支持键盘空格键操作
         document.addEventListener('keyup', function(e) {
             if (e.key === ' ' || e.keyCode === 32) {
-                updateQuestion();
+                updateContent();
                 nextButton.classList.add('active');
                 setTimeout(() => nextButton.classList.remove('active'), 200);
             }
@@ -585,18 +815,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 // 判断滑动方向，水平滑动幅度较大且竖直滑动幅度较小时判定为有效滑动
                 if (Math.abs(distX) > threshold && Math.abs(distY) < threshold/2) {
                     if (distX > 0) {
-                        // 右滑，切换到上一个问题
-                        // 这里仅实现下一个问题功能
-                        updateQuestion();
+                        // 右滑，切换到上一个问题或挑战
+                        // 这里仅实现新抽取功能
+                        updateContent();
                     } else {
-                        // 左滑，切换到下一个问题
-                        updateQuestion();
+                        // 左滑，切换到下一个问题或挑战
+                        updateContent();
                     }
                 }
             }, { passive: true });
         }
         
-        // 初始化问题总数显示
+        // 初始化界面
+        updateButtonText();
         updateTotalQuestions();
     }
     

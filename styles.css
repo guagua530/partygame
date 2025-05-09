@@ -147,10 +147,16 @@ h1::after {
     color: #999;
     font-size: 15px;
     margin-bottom: 20px;
-    display: inline-block;
-    padding: 5px 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.question-number > span:last-child {
     background-color: #f9f9f9;
     border-radius: 30px;
+    padding: 5px 15px;
     font-weight: 500;
     letter-spacing: 0.5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
@@ -244,6 +250,66 @@ h1 i {
     margin: 0 8px;
 }
 
+/* 添加游戏模式选择器样式 */
+.mode-selector {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.5);
+    padding: 5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    max-width: 280px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.mode-btn {
+    flex: 1;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 15px;
+    margin: 0 3px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #777;
+    font-weight: 500;
+    background: transparent;
+    letter-spacing: 0.5px;
+}
+
+.mode-btn.active {
+    background: linear-gradient(45deg, #ff7a8a, #ff5e7d);
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 4px 10px rgba(255, 94, 125, 0.2);
+}
+
+.mode-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.7);
+    transform: translateY(-1px);
+}
+
+/* 模式标签样式 */
+.mode-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 10px;
+    color: white;
+}
+
+.truth-mode {
+    background: linear-gradient(45deg, #ff7a8a, #ff5e7d);
+}
+
+.dare-mode {
+    background: linear-gradient(45deg, #f76b1c, #fad961);
+}
+
 /* 移动端优化 */
 @media (max-width: 480px) {
     body {
@@ -297,6 +363,28 @@ h1 i {
         padding: 4px 12px;
         margin-bottom: 16px;
     }
+    
+    .mode-selector {
+        max-width: 240px;
+        margin-bottom: 12px;
+    }
+    
+    .mode-btn {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    
+    .mode-tag {
+        padding: 2px 8px;
+        font-size: 11px;
+        margin-right: 8px;
+        margin-bottom: 6px;
+    }
+    
+    .question-number > span:last-child {
+        padding: 3px 10px;
+        font-size: 13px;
+    }
 }
 
 /* 新增针对移动端更精细的优化 */
@@ -329,6 +417,15 @@ h1 i {
     
     .category-btn {
         padding: 6px 12px;
+        font-size: 12px;
+    }
+    
+    .mode-selector {
+        max-width: 220px;
+    }
+    
+    .mode-btn {
+        padding: 7px 10px;
         font-size: 12px;
     }
 }
@@ -367,5 +464,18 @@ h1 i {
     
     h1::after {
         background: linear-gradient(to right, transparent, #ff7a8a, transparent);
+    }
+    
+    .mode-selector {
+        background: rgba(70, 70, 75, 0.5);
+    }
+    
+    .mode-btn:hover:not(.active) {
+        background: rgba(80, 80, 85, 0.7);
+    }
+    
+    .question-number > span:last-child {
+        background-color: rgba(70, 70, 75, 0.9);
+        color: #ccc;
     }
 } 

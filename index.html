@@ -16,17 +16,36 @@
     <div class="container">
         <div class="game-card">
             <h1><i class="fas fa-heart"></i> 真心话大冒险 <i class="fas fa-heart"></i></h1>
-            <div class="category-selector">
+            
+            <!-- 游戏模式选择 -->
+            <div class="mode-selector">
+                <button class="mode-btn active" data-mode="truth"><i class="fas fa-comment"></i> 真心话</button>
+                <button class="mode-btn" data-mode="dare"><i class="fas fa-fire"></i> 大冒险</button>
+            </div>
+            
+            <!-- 真心话分类 -->
+            <div class="category-selector" id="truth-categories">
                 <button class="category-btn active" data-category="all"><i class="fas fa-list"></i> 全部问题</button>
                 <button class="category-btn" data-category="original"><i class="fas fa-star"></i> 经典问题</button>
                 <button class="category-btn" data-category="psychology"><i class="fas fa-brain"></i> 心理问题</button>
             </div>
+            
+            <!-- 大冒险分类 -->
+            <div class="category-selector" id="dare-categories" style="display: none;">
+                <button class="category-btn active" data-category="all-dares"><i class="fas fa-list"></i> 全部挑战</button>
+                <button class="category-btn" data-category="easy-dares"><i class="fas fa-smile"></i> 轻松挑战</button>
+                <button class="category-btn" data-category="spicy-dares"><i class="fas fa-pepper-hot"></i> 刺激挑战</button>
+            </div>
+            
             <div class="question-container">
-                <div class="question-number"><i class="fas fa-question-circle"></i> 问题 <span id="questionNumber">?</span>/60</div>
+                <div class="question-number">
+                    <span id="mode-indicator" class="mode-tag truth-mode"><i class="fas fa-comment"></i> 真心话</span>
+                    <span><i class="fas fa-question-circle"></i> 问题 <span id="questionNumber">?</span>/<span id="totalQuestions">60</span></span>
+                </div>
                 <div id="question" class="question">点击下方按钮开始游戏</div>
             </div>
             <button id="nextBtn" class="btn"><i class="fas fa-random"></i> 抽取问题</button>
-            <div class="footer">有趣的问题，更精彩的回答</div>
+            <div class="footer">有趣的问题，精彩的互动</div>
         </div>
     </div>
     <script src="script.js"></script>
